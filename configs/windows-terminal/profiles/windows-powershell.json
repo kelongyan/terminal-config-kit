@@ -1,0 +1,16 @@
+{
+  "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+  "name": "Windows PowerShell",
+  "antialiasingMode": "grayscale",
+  "cursorShape": "bar",
+  "font": {
+    "face": "0xProto",
+    "size": 12
+  },
+  "opacity": 94,
+  "padding": "14, 10, 14, 12",
+  "startingDirectory": "%USERPROFILE%",
+  "useAcrylic": true,
+  "colorScheme": "Dracula Pro"
+}
+

@@ -1,0 +1,18 @@
+{
+  "guid": "{3b8ce9d0-e744-4d96-a282-83ac177fa604}",
+  "name": "PowerShell",
+  "antialiasingMode": "grayscale",
+  "commandline": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\"",
+  "cursorShape": "bar",
+  "font": {
+    "face": "0xProto",
+    "size": 12
+  },
+  "icon": "ms-appx:///ProfileIcons/pwsh.png",
+  "opacity": 94,
+  "padding": "14, 10, 14, 12",
+  "startingDirectory": "%USERPROFILE%",
+  "useAcrylic": true,
+  "colorScheme": "Dracula Pro"
+}
+

@@ -1,0 +1,35 @@
+# 第一行显示完整路径、Git 分支和失败状态；第二行显示提示符。
+add_newline = false
+format = "$directory$git_branch$git_status$status\n$character"
+
+[directory]
+# 不截断目录层级，始终显示完整路径。
+truncation_length = 0
+truncate_to_repo = false
+style = "bold #8DECF7"
+format = "[$path]($style)"
+
+[git_branch]
+# 使用偏粉色突出当前 Git 分支。
+symbol = "git "
+style = "bold #FF8FD1"
+format = " [${symbol}${branch}]($style)"
+
+[git_status]
+# 使用偏暖的金色显示工作区变化与 ahead/behind 状态。
+style = "bold #F6D68A"
+format = " [$all_status$ahead_behind]($style)"
+
+[status]
+# 仅在命令失败时显示退出码。
+disabled = false
+symbol = "× "
+style = "bold #FF7A90"
+format = " [$symbol$status]($style)"
+
+[character]
+# 成功、失败与 Vim 模式提示符都与当前配色统一。
+success_symbol = "[❯](bold #6FE1B1)"
+error_symbol = "[❯](bold #FF7A90)"
+vimcmd_symbol = "[❮](bold #B7A1FF)"
+

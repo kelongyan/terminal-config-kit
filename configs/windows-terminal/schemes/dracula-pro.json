@@ -1,0 +1,24 @@
+{
+  "name": "Dracula Pro",
+  "background": "#181A22",
+  "black": "#10131A",
+  "blue": "#B7A1FF",
+  "brightBlack": "#5A607C",
+  "brightBlue": "#D0C0FF",
+  "brightCyan": "#B9F6FF",
+  "brightGreen": "#A8F2CD",
+  "brightPurple": "#FFC2E6",
+  "brightRed": "#FF9CB0",
+  "brightWhite": "#F1F4FB",
+  "brightYellow": "#FFE4A8",
+  "cursorColor": "#FDF9FF",
+  "cyan": "#8DECF7",
+  "foreground": "#D7DEEE",
+  "green": "#6FE1B1",
+  "purple": "#FF8FD1",
+  "red": "#FF7A90",
+  "selectionBackground": "#343A4F",
+  "white": "#E2E8F4",
+  "yellow": "#F6D68A"
+}
+

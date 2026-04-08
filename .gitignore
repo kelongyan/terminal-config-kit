@@ -1,0 +1,13 @@
+# PowerShell 与脚本临时文件
+*.log
+*.tmp
+*.bak
+
+# Windows 资源管理器元数据
+Thumbs.db
+Desktop.ini
+
+# 本地备份与测试输出
+backup/
+.output/
+
