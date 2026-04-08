@@ -1,0 +1,14 @@
+# 默认启用文本文件规范化
+* text=auto
+
+# Windows 侧常编辑的配置文件统一使用 CRLF
+*.ps1 text eol=crlf
+*.psm1 text eol=crlf
+*.psd1 text eol=crlf
+*.json text eol=crlf
+*.toml text eol=crlf
+
+# 仓库元文件与说明文件保持 LF，减少跨平台噪声
+*.md text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
