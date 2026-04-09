@@ -1,0 +1,23 @@
+{
+  "name": "One Dark HC",
+  "background": "#1E222A",
+  "black": "#141821",
+  "blue": "#78A9FF",
+  "brightBlack": "#667084",
+  "brightBlue": "#9FC0FF",
+  "brightCyan": "#86E1F0",
+  "brightGreen": "#AFDF87",
+  "brightPurple": "#DDB6FF",
+  "brightRed": "#FF9AA2",
+  "brightWhite": "#FAFCFF",
+  "brightYellow": "#F3D97A",
+  "cursorColor": "#FFFFFF",
+  "cyan": "#5FC9D8",
+  "foreground": "#EAF0F8",
+  "green": "#8FCE73",
+  "purple": "#C7A0FF",
+  "red": "#F07178",
+  "selectionBackground": "#404859",
+  "white": "#B9C1CD",
+  "yellow": "#EBC275"
+}

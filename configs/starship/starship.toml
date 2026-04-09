@@ -6,30 +6,56 @@ format = "$directory$git_branch$git_status$status\n$character"
 # 不截断目录层级，始终显示完整路径。
 truncation_length = 0
 truncate_to_repo = false
-style = "bold #8DECF7"
+style = "bold #5FC9D8"
 format = "[$path]($style)"
 
 [git_branch]
-# 使用偏粉色突出当前 Git 分支。
+# 使用 One Dark 的紫色突出当前 Git 分支。
 symbol = "git "
-style = "bold #FF8FD1"
+style = "bold #C7A0FF"
 format = " [${symbol}${branch}]($style)"
 
 [git_status]
 # 使用偏暖的金色显示工作区变化与 ahead/behind 状态。
-style = "bold #F6D68A"
+style = "bold #EBC275"
 format = " [$all_status$ahead_behind]($style)"
 
 [status]
 # 仅在命令失败时显示退出码。
 disabled = false
 symbol = "× "
-style = "bold #FF7A90"
+style = "bold #F07178"
 format = " [$symbol$status]($style)"
 
 [character]
 # 成功、失败与 Vim 模式提示符都与当前配色统一。
-success_symbol = "[❯](bold #6FE1B1)"
-error_symbol = "[❯](bold #FF7A90)"
-vimcmd_symbol = "[❮](bold #B7A1FF)"
+success_symbol = "[❯](bold #8FCE73)"
+error_symbol = "[❯](bold #F07178)"
+vimcmd_symbol = "[❮](bold #78A9FF)"
 
+[palettes.cyberpunk_hack]
+# 偏蓝赛博风备用色板，强调冷静的蓝青科技感。
+directory = "#57C7FF"
+branch = "#8E9BFF"
+status = "#D9BC74"
+error = "#E67E8A"
+success = "#56BFAE"
+vim = "#5AA9FA"
+
+[palettes.sublime_mater]
+# Sublime Mater 备用色板，强调温润的蓝绿与金色层次。
+directory = "#58D1C9"
+branch = "#C792EA"
+status = "#E6C36A"
+error = "#F07178"
+success = "#A7C56B"
+vim = "#6CB6FF"
+
+[palettes.monokai_sublime_modern]
+# Monokai/Sublime 暖色经典备用色板，保留暖黄与黄绿色主调。
+directory = "#78DCE8"
+branch = "#C792EA"
+status = "#FFD866"
+error = "#FF7A88"
+success = "#A9DC76"
+vim = "#6DB7FF"

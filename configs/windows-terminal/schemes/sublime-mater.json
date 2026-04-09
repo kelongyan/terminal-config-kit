@@ -1,0 +1,23 @@
+{
+  "name": "Sublime Mater",
+  "background": "#1C212B",
+  "black": "#151922",
+  "blue": "#6CB6FF",
+  "brightBlack": "#5F6B7A",
+  "brightBlue": "#91CBFF",
+  "brightCyan": "#80E0D6",
+  "brightGreen": "#B5D97A",
+  "brightPurple": "#D7A6FF",
+  "brightRed": "#FF9A8B",
+  "brightWhite": "#F4F7FB",
+  "brightYellow": "#F2D389",
+  "cursorColor": "#FFCB6B",
+  "cyan": "#58D1C9",
+  "foreground": "#E7EEF7",
+  "green": "#A7C56B",
+  "purple": "#C792EA",
+  "red": "#F07178",
+  "selectionBackground": "#314056",
+  "white": "#C6D0DC",
+  "yellow": "#E6C36A"
+}

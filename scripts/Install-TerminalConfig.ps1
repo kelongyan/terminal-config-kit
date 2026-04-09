@@ -291,7 +291,7 @@ function Install-WindowsTerminalConfiguration {
     $defaultsPath = Join-Path $ConfigRoot "windows-terminal\\profiles\\defaults.json"
     $powerShellProfilePath = Join-Path $ConfigRoot "windows-terminal\\profiles\\powershell.json"
     $windowsPowerShellProfilePath = Join-Path $ConfigRoot "windows-terminal\\profiles\\windows-powershell.json"
-    $draculaSchemePath = Join-Path $ConfigRoot "windows-terminal\\schemes\\dracula-pro.json"
+    $schemeDirectoryPath = Join-Path $ConfigRoot "windows-terminal\\schemes"
 
     $settings = Merge-Map -Base $settings -Overlay (Read-JsonData -Path $baseSettingsPath)
 
@@ -320,7 +320,12 @@ function Install-WindowsTerminalConfiguration {
     }
 
     $settings["profiles"]["defaults"] = Merge-Map -Base $settings["profiles"]["defaults"] -Overlay (Read-JsonData -Path $defaultsPath)
-    $settings["schemes"] = Upsert-ArrayItemsByKey -Items @($settings["schemes"]) -NewItems @((Read-JsonData -Path $draculaSchemePath)) -KeyName "name"
+
+    # 关键逻辑：自动收集 schemes 目录下的所有主题文件，避免每新增一套主题都要重复修改安装脚本。
+    $schemeItems = Get-ChildItem -LiteralPath $schemeDirectoryPath -Filter "*.json" -File | Sort-Object Name | ForEach-Object {
+        Read-JsonData -Path $_.FullName
+    }
+    $settings["schemes"] = Upsert-ArrayItemsByKey -Items @($settings["schemes"]) -NewItems @($schemeItems) -KeyName "name"
     $settings["profiles"]["list"] = Upsert-ArrayItemsByKey -Items @($settings["profiles"]["list"]) -NewItems @(
         (Read-JsonData -Path $powerShellProfilePath),
         (Read-JsonData -Path $windowsPowerShellProfilePath)

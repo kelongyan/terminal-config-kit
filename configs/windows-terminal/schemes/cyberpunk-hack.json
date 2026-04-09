@@ -1,0 +1,23 @@
+{
+  "name": "Cyberpunk Hack",
+  "background": "#0A0F18",
+  "black": "#060A12",
+  "blue": "#5AA9FA",
+  "brightBlack": "#566274",
+  "brightBlue": "#8BC3FF",
+  "brightCyan": "#8FD8FF",
+  "brightGreen": "#7FD4C6",
+  "brightPurple": "#B7B9FF",
+  "brightRed": "#FF9AA5",
+  "brightWhite": "#F4F8FF",
+  "brightYellow": "#F0D58A",
+  "cursorColor": "#8FD8FF",
+  "cyan": "#57C7FF",
+  "foreground": "#E6F1FF",
+  "green": "#56BFAE",
+  "purple": "#8E9BFF",
+  "red": "#E67E8A",
+  "selectionBackground": "#18304A",
+  "white": "#B8C7D9",
+  "yellow": "#D9BC74"
+}

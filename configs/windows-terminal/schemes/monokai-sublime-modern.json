@@ -1,0 +1,23 @@
+{
+  "name": "Monokai Sublime Modern",
+  "background": "#17161A",
+  "black": "#0F1013",
+  "blue": "#6DB7FF",
+  "brightBlack": "#69676F",
+  "brightBlue": "#9DD2FF",
+  "brightCyan": "#7FE3D8",
+  "brightGreen": "#B9E06C",
+  "brightPurple": "#D8B6FF",
+  "brightRed": "#FF9E64",
+  "brightWhite": "#F8F8F2",
+  "brightYellow": "#FFE082",
+  "cursorColor": "#FFD866",
+  "cyan": "#5FD7C6",
+  "foreground": "#F3F1E7",
+  "green": "#A9DC76",
+  "purple": "#C792EA",
+  "red": "#FF7A88",
+  "selectionBackground": "#37333D",
+  "white": "#CFC8BC",
+  "yellow": "#FFD866"
+}
