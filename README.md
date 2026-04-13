@@ -27,16 +27,17 @@
 | `PowerShell 7 profile` | Shell 启动入口 | 保留最小初始化逻辑，负责接入 `starship` |
 | `Windows PowerShell profile` | 旧版兼容入口 | 提供一致的提示符体验，不强绑本机 Conda 路径 |
 | `starship.toml` | 提示符外观 | 双行布局，压缩命令间距，完整路径显示 |
-| `Windows Terminal schemes` | 终端色板 | 内置多套主题，覆盖冷色、赛博、Sublime 与 Monokai 风格 |
+| `Windows Terminal schemes` | 终端色板 | 内置多套主题，覆盖 Catppuccin、冷色、赛博、Sublime 与 Monokai 风格 |
 | `Windows Terminal profiles` | PowerShell 外观 | 统一字体、透明度、padding、默认行为 |
+| `Windows Terminal themes` | 窗口与标签页外观 | 管理 tab、tab row 与 application theme，补足 scheme 之外的 UI 主题 |
 | `Install-TerminalConfig.ps1` | 迁移脚本 | 备份本机配置，定向合并 Windows Terminal 配置 |
 
 ## Style Snapshot
 
 | 项目 | 当前值 |
 | --- | --- |
-| 默认终端主题 | `One Dark HC` |
-| 可用主题 | `One Dark HC`、`Cyberpunk Hack`、`Dracula Pro`、`Sublime Mater`、`Monokai Sublime Modern` |
+| 默认终端主题 | `Catppuccin Mocha` |
+| 可用主题 | `Catppuccin Mocha`、`One Dark HC`、`Cyberpunk Hack`、`Dracula Pro`、`Sublime Mater`、`Monokai Sublime Modern` |
 | 提示符引擎 | `starship` |
 | 提示符布局 | 首行路径与 Git，次行提示符 |
 | 命令间距 | 已关闭额外空行 |
@@ -82,12 +83,15 @@ terminal-config-kit/
 |       |   |-- defaults.json
 |       |   |-- powershell.json
 |       |   `-- windows-powershell.json
-|       `-- schemes/
-|           |-- cyberpunk-hack.json
-|           |-- dracula-pro.json
-|           |-- monokai-sublime-modern.json
-|           |-- one-dark-hc.json
-|           `-- sublime-mater.json
+|       |-- schemes/
+|       |   |-- catppuccin-mocha.json
+|       |   |-- cyberpunk-hack.json
+|       |   |-- dracula-pro.json
+|       |   |-- monokai-sublime-modern.json
+|       |   |-- one-dark-hc.json
+|       |   `-- sublime-mater.json
+|       `-- themes/
+|           `-- catppuccin-mocha.json
 |-- scripts/
 |   `-- Install-TerminalConfig.ps1
 |-- .gitattributes
@@ -135,7 +139,7 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 -SetPowe
 
 1. 备份当前机器已有配置到 `%USERPROFILE%\.terminal-config-backups\<时间戳>\`
 2. 复制 PowerShell 与 `starship` 配置文件
-3. 合并 Windows Terminal 的 `base settings`、`actions`、`keybindings`、`profiles`、`schemes`
+3. 合并 Windows Terminal 的 `base settings`、`actions`、`keybindings`、`profiles`、`schemes`、`themes`
 4. 可选地将 `PowerShell` 设为默认 profile
 
 ## Installer Options
@@ -173,11 +177,13 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 `
 
 相关文件：
 
+- `configs/windows-terminal/schemes/catppuccin-mocha.json`
 - `configs/windows-terminal/schemes/dracula-pro.json`
 - `configs/windows-terminal/schemes/one-dark-hc.json`
 - `configs/windows-terminal/schemes/cyberpunk-hack.json`
 - `configs/windows-terminal/schemes/sublime-mater.json`
 - `configs/windows-terminal/schemes/monokai-sublime-modern.json`
+- `configs/windows-terminal/themes/catppuccin-mocha.json`
 - `configs/starship/starship.toml`
 
 其中：
@@ -229,6 +235,8 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 -SetPowe
 
 - [`scripts/Install-TerminalConfig.ps1`](./scripts/Install-TerminalConfig.ps1)
 - [`configs/starship/starship.toml`](./configs/starship/starship.toml)
+- [`configs/windows-terminal/schemes/catppuccin-mocha.json`](./configs/windows-terminal/schemes/catppuccin-mocha.json)
+- [`configs/windows-terminal/themes/catppuccin-mocha.json`](./configs/windows-terminal/themes/catppuccin-mocha.json)
 - [`configs/windows-terminal/schemes/dracula-pro.json`](./configs/windows-terminal/schemes/dracula-pro.json)
 - [`configs/windows-terminal/schemes/one-dark-hc.json`](./configs/windows-terminal/schemes/one-dark-hc.json)
 - [`configs/windows-terminal/schemes/cyberpunk-hack.json`](./configs/windows-terminal/schemes/cyberpunk-hack.json)

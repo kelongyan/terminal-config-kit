@@ -164,7 +164,7 @@ function Install-PlainFile {
     }
 }
 
-# 函数：按唯一键合并对象数组，用于 actions、keybindings、schemes 与 profiles。
+# 函数：按唯一键合并对象数组，用于 actions、keybindings、schemes、themes 与 profiles。
 function Upsert-ArrayItemsByKey {
     param(
         [Parameter(Mandatory)]
@@ -292,6 +292,7 @@ function Install-WindowsTerminalConfiguration {
     $powerShellProfilePath = Join-Path $ConfigRoot "windows-terminal\\profiles\\powershell.json"
     $windowsPowerShellProfilePath = Join-Path $ConfigRoot "windows-terminal\\profiles\\windows-powershell.json"
     $schemeDirectoryPath = Join-Path $ConfigRoot "windows-terminal\\schemes"
+    $themeDirectoryPath = Join-Path $ConfigRoot "windows-terminal\\themes"
 
     $settings = Merge-Map -Base $settings -Overlay (Read-JsonData -Path $baseSettingsPath)
 
@@ -319,6 +320,10 @@ function Install-WindowsTerminalConfiguration {
         $settings["keybindings"] = @()
     }
 
+    if (-not (Test-MapHasKey -Map $settings -Key "themes")) {
+        $settings["themes"] = @()
+    }
+
     $settings["profiles"]["defaults"] = Merge-Map -Base $settings["profiles"]["defaults"] -Overlay (Read-JsonData -Path $defaultsPath)
 
     # 关键逻辑：自动收集 schemes 目录下的所有主题文件，避免每新增一套主题都要重复修改安装脚本。
@@ -326,6 +331,14 @@ function Install-WindowsTerminalConfiguration {
         Read-JsonData -Path $_.FullName
     }
     $settings["schemes"] = Upsert-ArrayItemsByKey -Items @($settings["schemes"]) -NewItems @($schemeItems) -KeyName "name"
+
+    if (Test-Path -LiteralPath $themeDirectoryPath) {
+        $themeItems = Get-ChildItem -LiteralPath $themeDirectoryPath -Filter "*.json" -File | Sort-Object Name | ForEach-Object {
+            Read-JsonData -Path $_.FullName
+        }
+        $settings["themes"] = Upsert-ArrayItemsByKey -Items @($settings["themes"]) -NewItems @($themeItems) -KeyName "name"
+    }
+
     $settings["profiles"]["list"] = Upsert-ArrayItemsByKey -Items @($settings["profiles"]["list"]) -NewItems @(
         (Read-JsonData -Path $powerShellProfilePath),
         (Read-JsonData -Path $windowsPowerShellProfilePath)

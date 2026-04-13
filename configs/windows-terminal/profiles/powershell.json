@@ -13,5 +13,5 @@
   "padding": "14, 10, 14, 12",
   "startingDirectory": "%USERPROFILE%",
   "useAcrylic": true,
-  "colorScheme": "One Dark HC"
+  "colorScheme": "Catppuccin Mocha"
 }

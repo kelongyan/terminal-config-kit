@@ -1,37 +1,31 @@
-# 第一行显示完整路径、Git 分支和失败状态；第二行显示提示符。
 add_newline = false
 format = "$directory$git_branch$git_status$status\n$character"
 
 [directory]
-# 不截断目录层级，始终显示完整路径。
 truncation_length = 0
 truncate_to_repo = false
-style = "bold #5FC9D8"
+style = "bold #89DCEB"
 format = "[$path]($style)"
 
 [git_branch]
-# 使用 One Dark 的紫色突出当前 Git 分支。
 symbol = "git "
-style = "bold #C7A0FF"
+style = "bold #CBA6F7"
 format = " [${symbol}${branch}]($style)"
 
 [git_status]
-# 使用偏暖的金色显示工作区变化与 ahead/behind 状态。
-style = "bold #EBC275"
+style = "bold #F9E2AF"
 format = " [$all_status$ahead_behind]($style)"
 
 [status]
-# 仅在命令失败时显示退出码。
 disabled = false
 symbol = "× "
-style = "bold #F07178"
+style = "bold #F38BA8"
 format = " [$symbol$status]($style)"
 
 [character]
-# 成功、失败与 Vim 模式提示符都与当前配色统一。
-success_symbol = "[❯](bold #8FCE73)"
-error_symbol = "[❯](bold #F07178)"
-vimcmd_symbol = "[❮](bold #78A9FF)"
+success_symbol = "[❯](bold #A6E3A1)"
+error_symbol = "[❯](bold #F38BA8)"
+vimcmd_symbol = "[❮](bold #89B4FA)"
 
 [palettes.cyberpunk_hack]
 # 偏蓝赛博风备用色板，强调冷静的蓝青科技感。
