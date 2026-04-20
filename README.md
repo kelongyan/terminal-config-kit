@@ -24,8 +24,8 @@
 
 | 模块 | 作用 | 当前策略 |
 | --- | --- | --- |
-| `PowerShell 7 profile` | Shell 启动入口 | 保留最小初始化逻辑，负责接入 `starship` |
-| `Windows PowerShell profile` | 旧版兼容入口 | 提供一致的提示符体验，不强绑本机 Conda 路径 |
+| `PowerShell 7 profile` | Shell 启动入口 | 保留最小初始化逻辑，负责接入 `starship`；内置 UTF-8 编码修复 |
+| `Windows PowerShell profile` | 旧版兼容入口 | 提供一致的提示符体验，不强绑本机 Conda 路径；内置 UTF-8 编码修复 |
 | `starship.toml` | 提示符外观 | 双行布局，压缩命令间距，完整路径显示 |
 | `Windows Terminal schemes` | 终端色板 | 内置多套主题，覆盖 Catppuccin、冷色、赛博、Sublime 与 Monokai 风格 |
 | `Windows Terminal profiles` | PowerShell 外观 | 统一字体、透明度、padding、默认行为 |
@@ -93,6 +93,7 @@ terminal-config-kit/
 |       `-- themes/
 |           `-- catppuccin-mocha.json
 |-- scripts/
+|   |-- Fix-ConsoleEncoding.ps1
 |   `-- Install-TerminalConfig.ps1
 |-- .gitattributes
 |-- .gitignore
@@ -160,6 +161,47 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 `
 | `-SkipStarship` | 跳过 `starship.toml` 安装 |
 | `-SkipPowerShell` | 跳过 PowerShell 7 配置安装 |
 | `-SkipLegacyWindowsPowerShell` | 跳过 Windows PowerShell 5 兼容配置安装 |
+
+## Fix Console Encoding
+
+Windows PowerShell 在中文环境下经常出现乱码（错误信息、中文输出显示为不可读字符）。本仓库已内置修复方案：
+
+### 自动修复
+
+通过安装脚本部署配置后，PowerShell 启动时会自动设置 UTF-8 编码，无需手动操作：
+
+```powershell
+pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 -SetPowerShellAsDefault
+```
+
+### 独立修复
+
+如果只需要修复编码问题而不做完整安装，可以使用独立脚本：
+
+```powershell
+# 仅修复当前会话
+pwsh -ExecutionPolicy Bypass -File .\scripts\Fix-ConsoleEncoding.ps1
+
+# 永久修复当前 PowerShell 版本的 Profile
+pwsh -ExecutionPolicy Bypass -File .\scripts\Fix-ConsoleEncoding.ps1 -Permanent
+
+# 永久修复所有 PowerShell 版本（PowerShell 7 + Windows PowerShell 5）
+pwsh -ExecutionPolicy Bypass -File .\scripts\Fix-ConsoleEncoding.ps1 -Permanent -AllProfiles
+```
+
+| 参数 | 作用 |
+| --- | --- |
+| `-Permanent` | 将编码配置写入 Profile 文件，每次启动自动生效 |
+| `-AllProfiles` | 与 `-Permanent` 配合，同时修改 PowerShell 7 和 Windows PowerShell 5 的 Profile |
+
+### 修复原理
+
+脚本会执行以下操作：
+
+1. 将控制台代码页切换为 `65001`（UTF-8）
+2. 设置 `[Console]::OutputEncoding` 为 UTF-8
+3. 设置 `[Console]::InputEncoding` 为 UTF-8
+4. 设置 `$OutputEncoding` 为 UTF-8
 
 ## Customization Map
 
