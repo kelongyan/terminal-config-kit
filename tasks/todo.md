@@ -8,7 +8,7 @@
 - [x] 重构 `scripts/Install-TerminalConfig.ps1`，保持现有安装命令兼容
 - [x] 新增 `scripts/Test-TerminalConfig.ps1` 校验入口
 - [x] 执行脚本验证并记录可核验证据
-- [ ] 提交变更并推送到 GitHub
+- [x] 提交变更并推送到 GitHub
 
 ## Review
 
@@ -20,3 +20,4 @@
 - 验证证据：`pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 -SkipPowerShell -SkipStarship -SkipLegacyWindowsPowerShell -BackupRoot .\tasks\tmp\backups -WindowsTerminalSettingsPath .\tasks\tmp\settings.json -SetPowerShellAsDefault` 通过。
 - 验证证据：临时 `settings.json` 校验结果显示 `theme = Catppuccin Mocha`、`defaultColorScheme = Catppuccin Mocha`、`themes` 类型为 `System.Object[]`、默认 profile 为 `PowerShell`。
 - 执行中修复了两个真实问题：空数组初次合并失败，以及单元素数组被 PowerShell 自动展开后写成对象。
+- 已提交并推送到 `origin/feat/catppuccin-mocha-theme`，最新提交包含 `b2819fe`。
