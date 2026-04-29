@@ -1,55 +1,59 @@
+# 第一行显示完整路径、Git 分支和失败状态；第二行显示可切换色板的提示符。
 add_newline = false
+palette = "dracula_pro"
 format = "$directory$git_branch$git_status$status\n$character"
 
 [directory]
+# 使用当前色板中的目录色显示完整路径，并保持目录不截断。
 truncation_length = 0
 truncate_to_repo = false
-style = "bold #89DCEB"
+style = "bold directory"
 format = "[$path]($style)"
 
 [git_branch]
+# 使用当前色板中的分支色突出当前 Git 分支。
 symbol = "git "
-style = "bold #CBA6F7"
+style = "bold branch"
 format = " [${symbol}${branch}]($style)"
 
 [git_status]
-style = "bold #F9E2AF"
+# 使用当前色板中的状态色显示工作区变化与 ahead/behind 状态。
+style = "bold status"
 format = " [$all_status$ahead_behind]($style)"
 
 [status]
+# 使用当前色板中的错误色在命令失败时显示退出码。
 disabled = false
 symbol = "× "
-style = "bold #F38BA8"
+style = "bold error"
 format = " [$symbol$status]($style)"
 
 [character]
-success_symbol = "[❯](bold #A6E3A1)"
-error_symbol = "[❯](bold #F38BA8)"
-vimcmd_symbol = "[❮](bold #89B4FA)"
+# 成功、失败与 Vim 模式提示符都跟随当前色板。
+success_symbol = "[❯](bold success)"
+error_symbol = "[❯](bold error)"
+vimcmd_symbol = "[❮](bold vim)"
 
-[palettes.cyberpunk_hack]
-# 偏蓝赛博风备用色板，强调冷静的蓝青科技感。
-directory = "#57C7FF"
-branch = "#8E9BFF"
-status = "#D9BC74"
-error = "#E67E8A"
-success = "#56BFAE"
-vim = "#5AA9FA"
+[palettes.dracula_pro]
+# 记录与 Windows Terminal 的 Dracula Pro 方案一致的关键颜色，便于后续同步调整。
+background = "#181A22"
+foreground = "#D7DEEE"
+directory = "#8DECF7"
+branch = "#FF8FD1"
+status = "#F6D68A"
+error = "#FF7A90"
+success = "#6FE1B1"
+vim = "#B7A1FF"
+selection = "#343A4F"
 
-[palettes.sublime_mater]
-# Sublime Mater 备用色板，强调温润的蓝绿与金色层次。
-directory = "#58D1C9"
-branch = "#C792EA"
-status = "#E6C36A"
-error = "#F07178"
-success = "#A7C56B"
-vim = "#6CB6FF"
-
-[palettes.monokai_sublime_modern]
-# Monokai/Sublime 暖色经典备用色板，保留暖黄与黄绿色主调。
-directory = "#78DCE8"
-branch = "#C792EA"
-status = "#FFD866"
-error = "#FF7A88"
-success = "#A9DC76"
-vim = "#6DB7FF"
+[palettes.nord]
+# 提供与 Windows Terminal Nord 方案一致的关键颜色，切换时只需修改顶部 palette。
+background = "#2E3440"
+foreground = "#D8DEE9"
+directory = "#88C0D0"
+branch = "#B48EAD"
+status = "#EBCB8B"
+error = "#BF616A"
+success = "#A3BE8C"
+vim = "#81A1C1"
+selection = "#434C5E"
