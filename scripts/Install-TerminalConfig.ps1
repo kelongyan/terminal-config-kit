@@ -13,6 +13,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+. (Join-Path $PSScriptRoot "lib\\TerminalConfig.Common.ps1")
+
 # 函数：输出带颜色的步骤日志，便于观察安装进度。
 function Write-Step {
     param(
@@ -33,77 +35,6 @@ function Ensure-Directory {
     if (-not (Test-Path -LiteralPath $Path)) {
         New-Item -ItemType Directory -Path $Path -Force | Out-Null
     }
-}
-
-# 函数：读取 JSON 文件并转换为 PowerShell 可操作对象。
-function Read-JsonData {
-    param(
-        [Parameter(Mandatory)]
-        [string]$Path
-    )
-
-    if (-not (Test-Path -LiteralPath $Path)) {
-        throw "未找到 JSON 文件：$Path"
-    }
-
-    $content = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
-    if ([string]::IsNullOrWhiteSpace($content)) {
-        return $null
-    }
-
-    return ConvertFrom-Json -InputObject $content -AsHashtable
-}
-
-# 函数：将对象以 UTF-8 编码写入 JSON 文件。
-function Write-JsonData {
-    param(
-        [Parameter(Mandatory)]
-        [object]$Data,
-
-        [Parameter(Mandatory)]
-        [string]$Path
-    )
-
-    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    $json = $Data | ConvertTo-Json -Depth 64
-    [System.IO.File]::WriteAllText($Path, $json, $utf8NoBom)
-}
-
-# 函数：判断字典对象中是否存在指定键。
-function Test-MapHasKey {
-    param(
-        [Parameter(Mandatory)]
-        [object]$Map,
-
-        [Parameter(Mandatory)]
-        [string]$Key
-    )
-
-    return ($Map -is [System.Collections.IDictionary]) -and ($Map.Keys -contains $Key)
-}
-
-# 函数：递归合并字典，保留未覆盖的现有配置。
-function Merge-Map {
-    param(
-        [Parameter(Mandatory)]
-        [System.Collections.IDictionary]$Base,
-
-        [Parameter(Mandatory)]
-        [System.Collections.IDictionary]$Overlay
-    )
-
-    foreach ($key in $Overlay.Keys) {
-        # 关键逻辑：如果两边都是字典，则递归合并；否则以仓库配置覆盖目标配置。
-        if ((Test-MapHasKey -Map $Base -Key $key) -and
-            ($Base[$key] -is [System.Collections.IDictionary]) -and
-            ($Overlay[$key] -is [System.Collections.IDictionary])) {
-            $Base[$key] = Merge-Map -Base $Base[$key] -Overlay $Overlay[$key]
-        } else {
-            $Base[$key] = $Overlay[$key]
-        }
-    }
-
-    return $Base
 }
 
 # 函数：为本次安装创建一个独立备份目录。
@@ -164,51 +95,25 @@ function Install-PlainFile {
     }
 }
 
-# 函数：按唯一键合并对象数组，用于 actions、keybindings、schemes、themes 与 profiles。
-function Upsert-ArrayItemsByKey {
+# 函数：写入动态生成的文本文件，并在覆盖前先备份旧文件。
+function Install-GeneratedFile {
     param(
         [Parameter(Mandatory)]
-        [object[]]$Items,
+        [string]$Content,
 
         [Parameter(Mandatory)]
-        [object[]]$NewItems,
+        [string]$DestinationPath,
 
         [Parameter(Mandatory)]
-        [string]$KeyName
+        [string]$BackupSessionPath
     )
 
-    $result = [System.Collections.Generic.List[object]]::new()
-    foreach ($item in @($Items)) {
-        $result.Add($item)
+    Ensure-Directory -Path (Split-Path -Path $DestinationPath -Parent)
+    Backup-File -Path $DestinationPath -BackupSessionPath $BackupSessionPath
+
+    if ($PSCmdlet.ShouldProcess($DestinationPath, "写入生成文件")) {
+        Write-TextData -Content $Content -Path $DestinationPath
     }
-
-    foreach ($newItem in @($NewItems)) {
-        if (-not ($newItem -is [System.Collections.IDictionary])) {
-            $result.Add($newItem)
-            continue
-        }
-
-        $matchedIndex = -1
-        for ($index = 0; $index -lt $result.Count; $index++) {
-            $existingItem = $result[$index]
-            if (($existingItem -is [System.Collections.IDictionary]) -and
-                (Test-MapHasKey -Map $existingItem -Key $KeyName) -and
-                (Test-MapHasKey -Map $newItem -Key $KeyName) -and
-                $existingItem[$KeyName] -eq $newItem[$KeyName]) {
-                $matchedIndex = $index
-                break
-            }
-        }
-
-        # 关键逻辑：同键对象递归合并，不同键对象追加，尽量保留目标机器已有的其它配置。
-        if ($matchedIndex -ge 0) {
-            $result[$matchedIndex] = Merge-Map -Base $result[$matchedIndex] -Overlay $newItem
-        } else {
-            $result.Add($newItem)
-        }
-    }
-
-    return $result.ToArray()
 }
 
 # 函数：定位 Windows Terminal 的 settings.json。
@@ -264,6 +169,59 @@ function Set-DefaultProfileGuidByName {
     }
 }
 
+# 函数：安装由模板和主题选择共同生成的 Starship 配置。
+function Install-StarshipConfiguration {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ConfigRoot,
+
+        [Parameter(Mandatory)]
+        [System.Collections.IDictionary]$ThemeSelection,
+
+        [Parameter(Mandatory)]
+        [string]$BackupSessionPath
+    )
+
+    $starshipContent = Get-ResolvedStarshipContent -ConfigRoot $ConfigRoot -ThemeSelection $ThemeSelection
+    Install-GeneratedFile -Content $starshipContent -DestinationPath (Join-Path $HOME ".config\\starship.toml") -BackupSessionPath $BackupSessionPath
+}
+
+# 函数：安装共享 PowerShell profile，并为两个 PowerShell 版本生成最终 bootstrap profile。
+function Install-PowerShellProfiles {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ConfigRoot,
+
+        [Parameter(Mandatory)]
+        [string]$BackupSessionPath,
+
+        [switch]$InstallPowerShell7Profile,
+
+        [switch]$InstallWindowsPowerShellProfile
+    )
+
+    if (-not $InstallPowerShell7Profile -and -not $InstallWindowsPowerShellProfile) {
+        return
+    }
+
+    $sharedProfileSourcePath = Join-Path $ConfigRoot "shared\\powershell\\common-profile.ps1"
+    $sharedProfileInstallPath = Get-SharedPowerShellProfileInstallPath -HomePath $HOME
+    Install-PlainFile -SourcePath $sharedProfileSourcePath -DestinationPath $sharedProfileInstallPath -BackupSessionPath $BackupSessionPath
+
+    if ($InstallPowerShell7Profile) {
+        $powerShell7TemplatePath = Join-Path $ConfigRoot "powershell\\Microsoft.PowerShell_profile.ps1"
+        $powerShell7Content = Get-GeneratedPowerShellProfileContent -TemplatePath $powerShell7TemplatePath -SharedProfileInstallPath $sharedProfileInstallPath
+        Install-GeneratedFile -Content $powerShell7Content -DestinationPath (Join-Path $HOME "Documents\\PowerShell\\Microsoft.PowerShell_profile.ps1") -BackupSessionPath $BackupSessionPath
+        Install-PlainFile -SourcePath (Join-Path $ConfigRoot "powershell\\powershell.config.json") -DestinationPath (Join-Path $HOME "Documents\\PowerShell\\powershell.config.json") -BackupSessionPath $BackupSessionPath
+    }
+
+    if ($InstallWindowsPowerShellProfile) {
+        $windowsPowerShellTemplatePath = Join-Path $ConfigRoot "windows-powershell\\profile.ps1"
+        $windowsPowerShellContent = Get-GeneratedPowerShellProfileContent -TemplatePath $windowsPowerShellTemplatePath -SharedProfileInstallPath $sharedProfileInstallPath
+        Install-GeneratedFile -Content $windowsPowerShellContent -DestinationPath (Join-Path $HOME "Documents\\WindowsPowerShell\\profile.ps1") -BackupSessionPath $BackupSessionPath
+    }
+}
+
 # 函数：合并并安装 Windows Terminal 配置。
 function Install-WindowsTerminalConfiguration {
     param(
@@ -273,28 +231,35 @@ function Install-WindowsTerminalConfiguration {
         [Parameter(Mandatory)]
         [string]$BackupSessionPath,
 
+        [Parameter(Mandatory)]
+        [System.Collections.IDictionary]$ThemeSelection,
+
         [string]$SettingsPath,
 
         [switch]$SetPowerShellDefault
     )
 
     $settingsJsonPath = Get-WindowsTerminalSettingsJsonPath -CustomPath $SettingsPath
-    $settings = Read-JsonData -Path $settingsJsonPath
+    $settings = if (Test-Path -LiteralPath $settingsJsonPath) {
+        Read-JsonData -Path $settingsJsonPath
+    } else {
+        [ordered]@{}
+    }
+
     if ($null -eq $settings) {
         $settings = [ordered]@{}
     }
 
-    $baseSettingsPath = Join-Path $ConfigRoot "windows-terminal\\base-settings.json"
-    $actionsPath = Join-Path $ConfigRoot "windows-terminal\\actions.json"
-    $keybindingsPath = Join-Path $ConfigRoot "windows-terminal\\keybindings.json"
-    $newTabMenuPath = Join-Path $ConfigRoot "windows-terminal\\new-tab-menu.json"
-    $defaultsPath = Join-Path $ConfigRoot "windows-terminal\\profiles\\defaults.json"
-    $powerShellProfilePath = Join-Path $ConfigRoot "windows-terminal\\profiles\\powershell.json"
-    $windowsPowerShellProfilePath = Join-Path $ConfigRoot "windows-terminal\\profiles\\windows-powershell.json"
-    $schemeDirectoryPath = Join-Path $ConfigRoot "windows-terminal\\schemes"
-    $themeDirectoryPath = Join-Path $ConfigRoot "windows-terminal\\themes"
+    $baseSettings = Get-ResolvedWindowsTerminalBaseSettings -ConfigRoot $ConfigRoot -ThemeSelection $ThemeSelection
+    $profileDefaults = Get-ResolvedWindowsTerminalProfileDefaults -ConfigRoot $ConfigRoot -ThemeSelection $ThemeSelection
+    $managedProfiles = Get-ManagedWindowsTerminalProfiles -ConfigRoot $ConfigRoot -ThemeSelection $ThemeSelection
+    $schemeItems = Get-JsonItemsFromDirectory -DirectoryPath (Join-Path $ConfigRoot "windows-terminal\\schemes")
+    $themeItems = Get-JsonItemsFromDirectory -DirectoryPath (Join-Path $ConfigRoot "windows-terminal\\themes")
+    $actions = Read-JsonData -Path (Join-Path $ConfigRoot "windows-terminal\\actions.json")
+    $keybindings = Read-JsonData -Path (Join-Path $ConfigRoot "windows-terminal\\keybindings.json")
+    $newTabMenu = Read-JsonData -Path (Join-Path $ConfigRoot "windows-terminal\\new-tab-menu.json")
 
-    $settings = Merge-Map -Base $settings -Overlay (Read-JsonData -Path $baseSettingsPath)
+    $settings = Merge-Map -Base $settings -Overlay $baseSettings
 
     if (-not (Test-MapHasKey -Map $settings -Key "profiles")) {
         $settings["profiles"] = [ordered]@{}
@@ -324,28 +289,13 @@ function Install-WindowsTerminalConfiguration {
         $settings["themes"] = @()
     }
 
-    $settings["profiles"]["defaults"] = Merge-Map -Base $settings["profiles"]["defaults"] -Overlay (Read-JsonData -Path $defaultsPath)
-
-    # 关键逻辑：自动收集 schemes 目录下的所有主题文件，避免每新增一套主题都要重复修改安装脚本。
-    $schemeItems = Get-ChildItem -LiteralPath $schemeDirectoryPath -Filter "*.json" -File | Sort-Object Name | ForEach-Object {
-        Read-JsonData -Path $_.FullName
-    }
-    $settings["schemes"] = Upsert-ArrayItemsByKey -Items @($settings["schemes"]) -NewItems @($schemeItems) -KeyName "name"
-
-    if (Test-Path -LiteralPath $themeDirectoryPath) {
-        $themeItems = Get-ChildItem -LiteralPath $themeDirectoryPath -Filter "*.json" -File | Sort-Object Name | ForEach-Object {
-            Read-JsonData -Path $_.FullName
-        }
-        $settings["themes"] = Upsert-ArrayItemsByKey -Items @($settings["themes"]) -NewItems @($themeItems) -KeyName "name"
-    }
-
-    $settings["profiles"]["list"] = Upsert-ArrayItemsByKey -Items @($settings["profiles"]["list"]) -NewItems @(
-        (Read-JsonData -Path $powerShellProfilePath),
-        (Read-JsonData -Path $windowsPowerShellProfilePath)
-    ) -KeyName "name"
-    $settings["actions"] = Upsert-ArrayItemsByKey -Items @($settings["actions"]) -NewItems @(Read-JsonData -Path $actionsPath) -KeyName "id"
-    $settings["keybindings"] = Upsert-ArrayItemsByKey -Items @($settings["keybindings"]) -NewItems @(Read-JsonData -Path $keybindingsPath) -KeyName "id"
-    $settings["newTabMenu"] = @(Read-JsonData -Path $newTabMenuPath)
+    $settings["profiles"]["defaults"] = Merge-Map -Base $settings["profiles"]["defaults"] -Overlay $profileDefaults
+    $settings["profiles"]["list"] = Upsert-ArrayItemsByKey -Items @($settings["profiles"]["list"]) -NewItems $managedProfiles -KeyName "name"
+    $settings["schemes"] = Upsert-ArrayItemsByKey -Items @($settings["schemes"]) -NewItems $schemeItems -KeyName "name"
+    $settings["themes"] = Upsert-ArrayItemsByKey -Items @($settings["themes"]) -NewItems $themeItems -KeyName "name"
+    $settings["actions"] = Upsert-ArrayItemsByKey -Items @($settings["actions"]) -NewItems @($actions) -KeyName "id"
+    $settings["keybindings"] = Upsert-ArrayItemsByKey -Items @($settings["keybindings"]) -NewItems @($keybindings) -KeyName "id"
+    $settings["newTabMenu"] = @($newTabMenu)
 
     if ($SetPowerShellDefault) {
         Set-DefaultProfileGuidByName -Settings $settings -ProfileName "PowerShell"
@@ -359,29 +309,25 @@ function Install-WindowsTerminalConfiguration {
 }
 
 $configRoot = Join-Path $RepoRoot "configs"
-$backupSessionPath = New-BackupSessionDirectory -RootPath $BackupRoot
+$themeSelection = Get-ThemeSelection -ConfigRoot $configRoot
+Assert-ThemeSelectionMatchesConfig -ConfigRoot $configRoot -ThemeSelection $themeSelection
 
+$backupSessionPath = New-BackupSessionDirectory -RootPath $BackupRoot
 Write-Step "本次安装备份目录：$backupSessionPath"
 
-if (-not $SkipPowerShell) {
-    Write-Step "安装 PowerShell 7 配置"
-    Install-PlainFile -SourcePath (Join-Path $configRoot "powershell\\Microsoft.PowerShell_profile.ps1") -DestinationPath (Join-Path $HOME "Documents\\PowerShell\\Microsoft.PowerShell_profile.ps1") -BackupSessionPath $backupSessionPath
-    Install-PlainFile -SourcePath (Join-Path $configRoot "powershell\\powershell.config.json") -DestinationPath (Join-Path $HOME "Documents\\PowerShell\\powershell.config.json") -BackupSessionPath $backupSessionPath
+if (-not $SkipPowerShell -or -not $SkipLegacyWindowsPowerShell) {
+    Write-Step "安装共享 PowerShell profile 与 bootstrap profile"
+    Install-PowerShellProfiles -ConfigRoot $configRoot -BackupSessionPath $backupSessionPath -InstallPowerShell7Profile:(-not $SkipPowerShell) -InstallWindowsPowerShellProfile:(-not $SkipLegacyWindowsPowerShell)
 }
 
 if (-not $SkipStarship) {
     Write-Step "安装 Starship 配置"
-    Install-PlainFile -SourcePath (Join-Path $configRoot "starship\\starship.toml") -DestinationPath (Join-Path $HOME ".config\\starship.toml") -BackupSessionPath $backupSessionPath
-}
-
-if (-not $SkipLegacyWindowsPowerShell) {
-    Write-Step "安装 Windows PowerShell 5 兼容 profile"
-    Install-PlainFile -SourcePath (Join-Path $configRoot "windows-powershell\\profile.ps1") -DestinationPath (Join-Path $HOME "Documents\\WindowsPowerShell\\profile.ps1") -BackupSessionPath $backupSessionPath
+    Install-StarshipConfiguration -ConfigRoot $configRoot -ThemeSelection $themeSelection -BackupSessionPath $backupSessionPath
 }
 
 if (-not $SkipWindowsTerminal) {
     Write-Step "合并 Windows Terminal 配置"
-    Install-WindowsTerminalConfiguration -ConfigRoot $configRoot -BackupSessionPath $backupSessionPath -SettingsPath $WindowsTerminalSettingsPath -SetPowerShellDefault:$SetPowerShellAsDefault
+    Install-WindowsTerminalConfiguration -ConfigRoot $configRoot -BackupSessionPath $backupSessionPath -ThemeSelection $themeSelection -SettingsPath $WindowsTerminalSettingsPath -SetPowerShellDefault:$SetPowerShellAsDefault
 }
 
 Write-Step "完成。请重启 Windows Terminal 以加载新配置。"

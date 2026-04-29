@@ -1,13 +1,10 @@
-# 说明：PowerShell 7 启动时加载 Starship 提示符。
-# 关键逻辑：仅在 starship 已安装时初始化，避免新机器缺少 starship 时启动报错。
+# 说明：这是 PowerShell 7 profile 的模板文件。
+# 关键逻辑：最终安装到用户目录时会解析共享 profile 路径，并统一加载共享初始化逻辑。
 
-# 修复中文乱码：设置控制台编码为 UTF-8
-chcp 65001 > $null
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-[Console]::InputEncoding = [System.Text.Encoding]::UTF8
-$OutputEncoding = [System.Text.Encoding]::UTF8
-
-if (Get-Command starship -ErrorAction SilentlyContinue) {
-    Invoke-Expression (& starship init powershell)
+$sharedProfilePath = '__TERMINAL_CONFIG_SHARED_PROFILE_PATH__'
+if (Test-Path -LiteralPath $sharedProfilePath) {
+    . $sharedProfilePath
+} else {
+    Write-Warning "未找到 terminal-config-kit 共享 profile：$sharedProfilePath"
 }
 

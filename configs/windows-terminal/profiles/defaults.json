@@ -1,5 +1,5 @@
 {
-  "colorScheme": "Catppuccin Mocha",
+  "colorScheme": "__TERMINAL_CONFIG_COLOR_SCHEME__",
   "font": {
     "face": "0xProto",
     "size": 11

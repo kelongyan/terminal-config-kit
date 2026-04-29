@@ -1,6 +1,6 @@
 # 第一行显示完整路径、Git 分支和失败状态；第二行显示可切换色板的提示符。
 add_newline = false
-palette = "dracula_pro"
+palette = "__TERMINAL_CONFIG_STARSHIP_PALETTE__"
 format = "$directory$git_branch$git_status$status\n$character"
 
 [directory]
@@ -45,6 +45,18 @@ error = "#FF7A90"
 success = "#6FE1B1"
 vim = "#B7A1FF"
 selection = "#343A4F"
+
+[palettes.catppuccin_mocha]
+# 记录与 Windows Terminal 的 Catppuccin Mocha 方案一致的关键颜色，作为默认主题时保持提示符配色统一。
+background = "#1E1E2E"
+foreground = "#CDD6F4"
+directory = "#89B4FA"
+branch = "#F5C2E7"
+status = "#F9E2AF"
+error = "#F38BA8"
+success = "#A6E3A1"
+vim = "#94E2D5"
+selection = "#585B70"
 
 [palettes.nord]
 # 提供与 Windows Terminal Nord 方案一致的关键颜色，切换时只需修改顶部 palette。
