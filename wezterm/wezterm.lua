@@ -4,100 +4,147 @@
 local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
--- ==================== Dracula 主题配置 ====================
+local palette = {
+  text = "#E5DBFC",
+  text_muted = "#BEB8D4",
+  text_bright = "#F4EEFF",
+  background = "#1F2230",
+  surface = "#252A38",
+  surface_active = "#31384A",
+  surface_elevated = "#3A4258",
+  border = "#6A7296",
+  cursor = "#C09BFC",
+  pink = "#FF85CF",
+  cyan = "#99EAFE",
+  red = "#FF6478",
+  green = "#63E2A2",
+  yellow = "#F4E38D",
+}
 
--- 颜色方案: 使用内置 Dracula 主题
-config.color_scheme = "Dracula"
-
--- 背景透明度 (0.0 完全透明 - 1.0 完全不透明)
-config.window_background_opacity = 0.92
-
--- 背景模糊效果 (需要窗口管理器支持)
-config.win32_system_backdrop = "Acrylic"
-
--- ==================== 字体配置 ====================
-
-config.font = wezterm.font_with_fallback({
-  { family = "JetBrains Mono", weight = "Medium" },
-  { family = "Noto Sans Mono CJK SC" },  -- 中文回退字体
-})
-config.font_size = 12.0
-
--- ==================== 窗口外观 ====================
-
--- 窗口内边距
-config.window_padding = {
+local padding = {
   left = 12,
   right = 12,
   top = 12,
   bottom = 12,
 }
 
--- 标签栏样式 (顶部显示)
-config.use_fancy_tab_bar = false
-config.tab_bar_at_bottom = false
-config.hide_tab_bar_if_only_one_tab = false
+local tab_title_min_width = 8
+local tab_title_padding = " "
 
--- Dracula 融合风格标签栏颜色
+local function tab_title(tab_info)
+  local title = tab_info.tab_title
+  if title and #title > 0 then
+    return title
+  end
+
+  return tab_info.active_pane.title
+end
+
+wezterm.on("format-tab-title", function(tab, tabs, panes, cfg, hover, max_width)
+  local title = tab_title(tab)
+  local available_width = math.max(max_width - #tab_title_padding, tab_title_min_width)
+
+  if wezterm.column_width(title) > available_width then
+    title = wezterm.truncate_left(title, available_width)
+  end
+
+  return tab_title_padding .. title
+end)
+
 config.colors = {
+  foreground = palette.text,
+  background = palette.background,
+  cursor_bg = palette.cursor,
+  cursor_fg = palette.background,
+  cursor_border = palette.cursor,
+  selection_bg = palette.surface_elevated,
+  selection_fg = palette.text_bright,
+  scrollbar_thumb = palette.surface_elevated,
+  split = palette.border,
+  compose_cursor = palette.pink,
+  ansi = {
+    "#21222C",
+    palette.red,
+    palette.green,
+    palette.yellow,
+    palette.cursor,
+    palette.pink,
+    palette.cyan,
+    "#E6E6E1",
+  },
+  brights = {
+    "#4D5566",
+    "#FF6E6E",
+    "#69FF94",
+    "#FFFFA5",
+    "#D6ACFF",
+    "#FF92DF",
+    "#A4FFFF",
+    "#FFFFFF",
+  },
   tab_bar = {
-    -- 标签栏背景 (Dracula Background)
-    background = "#282A36",
-
-    -- 活动标签
+    background = palette.surface,
     active_tab = {
-      bg_color = "#44475A",
-      fg_color = "#BD93F9",
+      bg_color = palette.surface_elevated,
+      fg_color = palette.cursor,
       intensity = "Bold",
     },
-
-    -- 非活动标签
     inactive_tab = {
-      bg_color = "#282A36",
-      fg_color = "#F8F8F2",
+      bg_color = palette.surface,
+      fg_color = palette.text_muted,
     },
-
-    -- 非活动标签悬停
     inactive_tab_hover = {
-      bg_color = "#44475A",
-      fg_color = "#F8F8F2",
+      bg_color = palette.surface_active,
+      fg_color = palette.text_bright,
     },
-
-    -- 新建标签按钮
     new_tab = {
-      bg_color = "#282A36",
-      fg_color = "#F8F8F2",
+      bg_color = palette.surface,
+      fg_color = palette.cyan,
     },
-
-    -- 新建标签按钮悬停
     new_tab_hover = {
-      bg_color = "#44475A",
-      fg_color = "#F8F8F2",
+      bg_color = palette.surface_active,
+      fg_color = palette.pink,
     },
   },
 }
 
--- 窗口装饰 (标题栏)
+config.font = wezterm.font_with_fallback({
+  { family = "JetBrains Mono", weight = "Medium" },
+  { family = "Noto Sans Mono CJK SC" },
+})
+config.font_size = 12.0
+config.window_padding = padding
+config.window_background_opacity = 1.0
+config.win32_system_backdrop = "Mica"
+config.window_close_confirmation = "NeverPrompt"
+
 config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
+config.window_frame = {
+  font = wezterm.font({ family = "Segoe UI", weight = "Bold" }),
+  font_size = 10.0,
+  active_titlebar_bg = palette.surface,
+  inactive_titlebar_bg = palette.background,
+}
 
--- ==================== 光标配置 ====================
+config.use_fancy_tab_bar = true
+config.tab_bar_at_bottom = false
+config.hide_tab_bar_if_only_one_tab = false
+config.show_new_tab_button_in_tab_bar = true
+config.enable_tab_bar = true
+config.tab_max_width = 32
 
--- 光标样式: 竖线闪烁
+config.mouse_bindings = {
+  {
+    event = { Up = { streak = 1, button = "Right" } },
+    mods = "NONE",
+    action = wezterm.action.PasteFrom("Clipboard"),
+  },
+}
+
 config.default_cursor_style = "BlinkingBar"
-
--- 闪烁频率 (毫秒, 默认 800)
 config.cursor_blink_rate = 530
-
--- ==================== 其他设置 ====================
-
--- 默认启动 PowerShell
 config.default_prog = { "pwsh.exe", "-NoLogo" }
-
--- 初始窗口大小
 config.initial_cols = 120
 config.initial_rows = 35
-
--- 启用状态栏
-config.enable_tab_bar = true
 
 return config
