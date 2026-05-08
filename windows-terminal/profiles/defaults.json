@@ -1,7 +1,7 @@
 {
-  "colorScheme": "One Dark HC",
+  "colorScheme": "Dracula",
   "font": {
-    "face": "0xProto",
+    "face": "JetBrains Mono",
     "size": 11
   },
   "opacity": 91,

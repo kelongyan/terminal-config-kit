@@ -4,12 +4,12 @@
   "antialiasingMode": "grayscale",
   "cursorShape": "bar",
   "font": {
-    "face": "0xProto",
-    "size": 12
+    "face": "JetBrains Mono",
+    "size": 11
   },
   "opacity": 94,
   "padding": "14, 10, 14, 12",
   "startingDirectory": "%USERPROFILE%",
   "useAcrylic": true,
-  "colorScheme": "One Dark HC"
+  "colorScheme": "Dracula"
 }

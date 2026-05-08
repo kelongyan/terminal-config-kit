@@ -7,7 +7,8 @@ param(
     [switch]$SkipPowerShell,
     [switch]$SkipStarship,
     [switch]$SkipWindowsTerminal,
-    [switch]$SkipLegacyWindowsPowerShell
+    [switch]$SkipLegacyWindowsPowerShell,
+    [switch]$SkipWezTerm
 )
 
 Set-StrictMode -Version Latest
@@ -345,7 +346,7 @@ function Install-WindowsTerminalConfiguration {
     }
 }
 
-$configRoot = Join-Path $RepoRoot "configs"
+$configRoot = $RepoRoot
 $backupSessionPath = New-BackupSessionDirectory -RootPath $BackupRoot
 
 Write-Step "本次安装备份目录：$backupSessionPath"
@@ -363,12 +364,17 @@ if (-not $SkipStarship) {
 
 if (-not $SkipLegacyWindowsPowerShell) {
     Write-Step "安装 Windows PowerShell 5 兼容 profile"
-    Install-PlainFile -SourcePath (Join-Path $configRoot "windows-powershell\\profile.ps1") -DestinationPath (Join-Path $HOME "Documents\\WindowsPowerShell\\profile.ps1") -BackupSessionPath $backupSessionPath
+    Install-PlainFile -SourcePath (Join-Path $configRoot "powershell\\profile.winps.ps1") -DestinationPath (Join-Path $HOME "Documents\\WindowsPowerShell\\profile.ps1") -BackupSessionPath $backupSessionPath
 }
 
 if (-not $SkipWindowsTerminal) {
     Write-Step "合并 Windows Terminal 配置"
     Install-WindowsTerminalConfiguration -ConfigRoot $configRoot -BackupSessionPath $backupSessionPath -SettingsPath $WindowsTerminalSettingsPath -SetPowerShellDefault:$SetPowerShellAsDefault
+}
+
+if (-not $SkipWezTerm) {
+    Write-Step "安装 WezTerm 配置"
+    Install-PlainFile -SourcePath (Join-Path $configRoot "wezterm\\wezterm.lua") -DestinationPath (Join-Path $HOME ".wezterm.lua") -BackupSessionPath $backupSessionPath
 }
 
 Write-Step "完成。请重启 Windows Terminal 以加载新配置。"

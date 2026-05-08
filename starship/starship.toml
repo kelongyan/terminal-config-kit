@@ -1,0 +1,143 @@
+# Dracula 风格 Starship 配置
+# 第一行: 信息行 (用户名 路径 Git状态 内存 耗时 时间)
+# 第二行: 提示符
+
+add_newline = false
+format = """$username$hostname \
+$directory\
+$git_branch\
+$git_status\
+$memory_usage\
+$cmd_duration\
+$time
+$character"""
+
+# ==================== 默认 Dracula 色板 ====================
+# palette = "dracula"  # 取消注释以显式指定色板
+
+[username]
+show_always = true
+style_user = "bold #BD93F9"
+style_root = "bold #FF5555"
+format = "[Zhaxideler]($style_user)"
+
+[hostname]
+disabled = true
+
+[directory]
+truncation_length = 0
+truncate_to_repo = false
+style = "bold #BD93F9"
+format = " [$path]($style)"
+
+[git_branch]
+symbol = " "
+style = "bold #BD93F9"
+format = " [${symbol}${branch}]($style)"
+
+[git_status]
+style = "bold #BD93F9"
+format = " [$all_status$ahead_behind]($style)"
+
+[memory_usage]
+disabled = false
+threshold = 75
+symbol = " "
+style = "bold #BD93F9"
+format = " [$ram]($style)"
+
+[status]
+disabled = false
+symbol = "× "
+style = "bold #FF5555"
+format = "[$symbol$status]($style)"
+
+[character]
+success_symbol = "[❯](bold #BD93F9)"
+error_symbol = "[❯](bold #FF5555)"
+vimcmd_symbol = "[❮](bold #BD93F9)"
+
+[cmd_duration]
+min_time = 2_000
+format = " [$duration]($style)"
+style = "bold #BD93F9"
+
+[time]
+disabled = false
+format = " [$time]($style)"
+style = "bold #BD93F9"
+time_format = "%H:%M:%S"
+
+[nodejs]
+disabled = false
+format = "[$symbol($version)]($style)"
+symbol = " "
+style = "bold #50FA7B"
+
+[python]
+disabled = false
+format = "[$symbol($version)]($style)"
+symbol = " "
+style = "bold #FFB86C"
+
+[rust]
+disabled = false
+format = "[$symbol($version)]($style)"
+symbol = " "
+style = "bold #FF5555"
+
+[golang]
+disabled = false
+format = "[$symbol($version)]($style)"
+symbol = " "
+style = "bold #8BE9FD"
+
+[docker_context]
+disabled = false
+format = "[$symbol$context]($style)"
+symbol = "️ "
+style = "bold #8BE9FD"
+
+[kubernetes]
+disabled = false
+format = "[$symbol$context]($style)"
+symbol = "☸️ "
+style = "bold #8BE9FD"
+
+# ==================== 色板定义 ====================
+
+[palettes.dracula]
+# Dracula 官方色板（默认）
+directory = "#BD93F9"
+branch = "#BD93F9"
+status = "#BD93F9"
+error = "#FF5555"
+success = "#BD93F9"
+vim = "#BD93F9"
+
+[palettes.cyberpunk_hack]
+# 偏蓝赛博风，强调冷静的蓝青科技感
+directory = "#57C7FF"
+branch = "#8E9BFF"
+status = "#D9BC74"
+error = "#E67E8A"
+success = "#56BFAE"
+vim = "#5AA9FA"
+
+[palettes.sublime_mater]
+# Sublime Mater，温润的蓝绿与金色层次
+directory = "#58D1C9"
+branch = "#C792EA"
+status = "#E6C36A"
+error = "#F07178"
+success = "#A7C56B"
+vim = "#6CB6FF"
+
+[palettes.monokai_sublime_modern]
+# Monokai/Sublime 暖色经典，暖黄与黄绿色主调
+directory = "#78DCE8"
+branch = "#C792EA"
+status = "#FFD866"
+error = "#FF7A88"
+success = "#A9DC76"
+vim = "#6DB7FF"

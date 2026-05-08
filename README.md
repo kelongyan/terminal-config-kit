@@ -26,21 +26,22 @@
 | --- | --- | --- |
 | `PowerShell 7 profile` | Shell 启动入口 | 保留最小初始化逻辑，负责接入 `starship` |
 | `Windows PowerShell profile` | 旧版兼容入口 | 提供一致的提示符体验，不强绑本机 Conda 路径 |
-| `starship.toml` | 提示符外观 | 双行布局，压缩命令间距，完整路径显示 |
-| `Windows Terminal schemes` | 终端色板 | 内置多套主题，覆盖冷色、赛博、Sublime 与 Monokai 风格 |
+| `starship.toml` | 提示符外观 | 双行布局，Dracula 风格，完整模块（路径、Git、内存、耗时、语言版本） |
+| `Windows Terminal schemes` | 终端色板 | 内置多套主题，覆盖 Dracula、赛博、Sublime 与 Monokai 风格 |
 | `Windows Terminal profiles` | PowerShell 外观 | 统一字体、透明度、padding、默认行为 |
+| `WezTerm config` | 备选终端 | Dracula 主题，亚克力背景，JetBrains Mono 字体 |
 | `Install-TerminalConfig.ps1` | 迁移脚本 | 备份本机配置，定向合并 Windows Terminal 配置 |
 
 ## Style Snapshot
 
 | 项目 | 当前值 |
 | --- | --- |
-| 默认终端主题 | `One Dark HC` |
-| 可用主题 | `One Dark HC`、`Cyberpunk Hack`、`Dracula Pro`、`Sublime Mater`、`Monokai Sublime Modern` |
+| 默认终端主题 | `Dracula` |
+| 可用主题 | `Dracula`、`Cyberpunk Hack`、`Dracula Pro`、`Sublime Mater`、`Monokai Sublime Modern` |
 | 提示符引擎 | `starship` |
-| 提示符布局 | 首行路径与 Git，次行提示符 |
+| 提示符布局 | 首行用户名、路径、Git、内存、耗时、时间，次行提示符 |
 | 命令间距 | 已关闭额外空行 |
-| 推荐字体 | `0xProto` |
+| 推荐字体 | `JetBrains Mono` |
 
 ## Design Principles
 
@@ -65,29 +66,29 @@ Windows Terminal 不会被整份覆盖，而是通过脚本做定向合并，尽
 
 ```text
 terminal-config-kit/
-|-- configs/
-|   |-- powershell/
-|   |   |-- Microsoft.PowerShell_profile.ps1
-|   |   `-- powershell.config.json
-|   |-- starship/
-|   |   `-- starship.toml
-|   |-- windows-powershell/
-|   |   `-- profile.ps1
-|   `-- windows-terminal/
-|       |-- actions.json
-|       |-- base-settings.json
-|       |-- keybindings.json
-|       |-- new-tab-menu.json
-|       |-- profiles/
-|       |   |-- defaults.json
-|       |   |-- powershell.json
-|       |   `-- windows-powershell.json
-|       `-- schemes/
-|           |-- cyberpunk-hack.json
-|           |-- dracula-pro.json
-|           |-- monokai-sublime-modern.json
-|           |-- one-dark-hc.json
-|           `-- sublime-mater.json
+|-- powershell/
+|   |-- Microsoft.PowerShell_profile.ps1
+|   |-- powershell.config.json
+|   `-- profile.winps.ps1          # Windows PowerShell 5 兼容
+|-- starship/
+|   `-- starship.toml
+|-- windows-terminal/
+|   |-- actions.json
+|   |-- base-settings.json
+|   |-- keybindings.json
+|   |-- new-tab-menu.json
+|   |-- profiles/
+|   |   |-- defaults.json
+|   |   |-- powershell.json
+|   |   `-- windows-powershell.json
+|   `-- schemes/
+|       |-- cyberpunk-hack.json
+|       |-- dracula.json
+|       |-- dracula-pro.json
+|       |-- monokai-sublime-modern.json
+|       `-- sublime-mater.json
+|-- wezterm/
+|   `-- wezterm.lua
 |-- scripts/
 |   `-- Install-TerminalConfig.ps1
 |-- .gitattributes
@@ -99,10 +100,10 @@ terminal-config-kit/
 
 在新机器上使用前，建议先准备：
 
-1. `Windows Terminal`
+1. `Windows Terminal`（或 `WezTerm` 作为备选终端）
 2. `PowerShell 7`
 3. `starship`
-4. 推荐字体 `0xProto`
+4. 推荐字体 `JetBrains Mono`
 
 如果目标机器尚未安装 `starship`，PowerShell 依然可以启动；因为 `profile` 内做了存在性判断，只是不会显示 `starship` 提示符。
 
@@ -126,7 +127,7 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 -SetPowe
 ```text
 1. 关闭所有 Windows Terminal 窗口
 2. 重新打开 Windows Terminal
-3. 如未安装 0xProto，请先安装字体后再观察最终效果
+3. 如未安装 JetBrains Mono，请先安装字体后再观察最终效果
 ```
 
 ## What The Installer Does
@@ -146,7 +147,8 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 `
   -SkipWindowsTerminal `
   -SkipStarship `
   -SkipPowerShell `
-  -SkipLegacyWindowsPowerShell
+  -SkipLegacyWindowsPowerShell `
+  -SkipWezTerm
 ```
 
 | 参数 | 作用 |
@@ -156,6 +158,7 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 `
 | `-SkipStarship` | 跳过 `starship.toml` 安装 |
 | `-SkipPowerShell` | 跳过 PowerShell 7 配置安装 |
 | `-SkipLegacyWindowsPowerShell` | 跳过 Windows PowerShell 5 兼容配置安装 |
+| `-SkipWezTerm` | 跳过 WezTerm 配置安装 |
 
 ## Customization Map
 
@@ -163,9 +166,10 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 `
 
 相关文件：
 
-- `configs/windows-terminal/profiles/defaults.json`
-- `configs/windows-terminal/profiles/powershell.json`
-- `configs/windows-terminal/profiles/windows-powershell.json`
+- `windows-terminal/profiles/defaults.json`
+- `windows-terminal/profiles/powershell.json`
+- `windows-terminal/profiles/windows-powershell.json`
+- `wezterm/wezterm.lua`
 
 以后如果要改字体，只需要改 `font.face` 与 `font.size`。
 
@@ -173,12 +177,12 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 `
 
 相关文件：
 
-- `configs/windows-terminal/schemes/dracula-pro.json`
-- `configs/windows-terminal/schemes/one-dark-hc.json`
-- `configs/windows-terminal/schemes/cyberpunk-hack.json`
-- `configs/windows-terminal/schemes/sublime-mater.json`
-- `configs/windows-terminal/schemes/monokai-sublime-modern.json`
-- `configs/starship/starship.toml`
+- `windows-terminal/schemes/dracula.json`
+- `windows-terminal/schemes/dracula-pro.json`
+- `windows-terminal/schemes/cyberpunk-hack.json`
+- `windows-terminal/schemes/sublime-mater.json`
+- `windows-terminal/schemes/monokai-sublime-modern.json`
+- `starship/starship.toml`
 
 其中：
 
@@ -189,7 +193,7 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 `
 
 相关文件：
 
-- `configs/starship/starship.toml`
+- `starship/starship.toml`
 
 如果想把双行提示符改成单行，只需要调整最上方的 `format`。
 
@@ -228,13 +232,12 @@ pwsh -ExecutionPolicy Bypass -File .\scripts\Install-TerminalConfig.ps1 -SetPowe
 如果你想快速理解这套配置，从这几个文件开始最省时间：
 
 - [`scripts/Install-TerminalConfig.ps1`](./scripts/Install-TerminalConfig.ps1)
-- [`configs/starship/starship.toml`](./configs/starship/starship.toml)
-- [`configs/windows-terminal/schemes/dracula-pro.json`](./configs/windows-terminal/schemes/dracula-pro.json)
-- [`configs/windows-terminal/schemes/one-dark-hc.json`](./configs/windows-terminal/schemes/one-dark-hc.json)
-- [`configs/windows-terminal/schemes/cyberpunk-hack.json`](./configs/windows-terminal/schemes/cyberpunk-hack.json)
-- [`configs/windows-terminal/schemes/sublime-mater.json`](./configs/windows-terminal/schemes/sublime-mater.json)
-- [`configs/windows-terminal/schemes/monokai-sublime-modern.json`](./configs/windows-terminal/schemes/monokai-sublime-modern.json)
-- [`configs/powershell/Microsoft.PowerShell_profile.ps1`](./configs/powershell/Microsoft.PowerShell_profile.ps1)
+- [`starship/starship.toml`](./starship/starship.toml)
+- [`windows-terminal/schemes/dracula.json`](./windows-terminal/schemes/dracula.json)
+- [`windows-terminal/schemes/dracula-pro.json`](./windows-terminal/schemes/dracula-pro.json)
+- [`windows-terminal/schemes/cyberpunk-hack.json`](./windows-terminal/schemes/cyberpunk-hack.json)
+- [`wezterm/wezterm.lua`](./wezterm/wezterm.lua)
+- [`powershell/Microsoft.PowerShell_profile.ps1`](./powershell/Microsoft.PowerShell_profile.ps1)
 
 ## License
 
