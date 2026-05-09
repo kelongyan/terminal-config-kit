@@ -1,4 +1,4 @@
-[CmdletBinding(SupportsShouldProcess = $true)]
+﻿[CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path,
     [string]$BackupRoot = (Join-Path $HOME ".terminal-config-backups"),
@@ -13,6 +13,10 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+# 确保控制台输出使用 UTF-8 编码，解决中文显示问题
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
 
 # 函数：输出带颜色的步骤日志，便于观察安装进度。
 function Write-Step {

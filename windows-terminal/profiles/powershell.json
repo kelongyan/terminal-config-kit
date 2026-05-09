@@ -2,7 +2,7 @@
   "guid": "{3b8ce9d0-e744-4d96-a282-83ac177fa604}",
   "name": "PowerShell",
   "antialiasingMode": "grayscale",
-  "commandline": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\"",
+  "commandline": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -NoLogo",
   "cursorShape": "bar",
   "font": {
     "face": "JetBrains Mono",
